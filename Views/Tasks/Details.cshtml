@@ -1,0 +1,63 @@
+@model TodoTask
+
+@{
+    ViewData["Title"] = Model.Title;
+    string userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+}
+
+<h1>@Model.Title</h1>
+
+<section class="task-details">
+    <dl>
+        <dt>Номер</dt>
+        <dd>@Model.Id</dd>
+        <dt>Статус</dt>
+        <dd>@Model.Status.ToDisplayName()</dd>
+        <dt>Приоритет</dt>
+        <dd><span class="@Model.Priority.ToCssClass()">@Model.Priority.ToDisplayName()</span></dd>
+        <dt>Создатель</dt>
+        <dd>@Model.CreatorName</dd>
+        <dt>Исполнитель</dt>
+        <dd>@(Model.AssigneeName ?? "Свободна")</dd>
+        <dt>Дата создания</dt>
+        <dd>@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+        @if (Model.Status == TodoStatus.Closed && Model.ClosedAt.HasValue)
+        {
+            <dt>Дата закрытия</dt>
+            <dd>@Model.ClosedAt.Value.ToString("dd.MM.yyyy HH:mm")</dd>
+        }
+    </dl>
+    <div>
+        <h2>Описание задачи</h2>
+        <p>@Model.Description</p>
+    </div>
+</section>
+
+<div class="task-actions mt-3">
+    @if (Model.Status == TodoStatus.New && string.IsNullOrWhiteSpace(Model.AssigneeId))
+    {
+        <form asp-action="Take" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button class="btn btn-outline-primary" type="submit">Взять задачу</button>
+        </form>
+    }
+    @if (Model.Status == TodoStatus.Open && (User.IsInRole("admin") || Model.AssigneeId == userId))
+    {
+        <form asp-action="Close" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button class="btn btn-outline-warning" type="submit">Закрыть</button>
+        </form>
+    }
+    @if (User.IsInRole("admin") || Model.CreatorId == userId)
+    {
+        <a class="btn btn-outline-success" asp-action="Edit" asp-route-id="@Model.Id">Изменить</a>
+    }
+    @if (User.IsInRole("admin") || Model.CreatorId == userId)
+    {
+        <form asp-action="Delete" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button class="btn btn-outline-danger" type="submit">Удалить</button>
+        </form>
+    }
+    <a class="btn btn-secondary" asp-action="Index">Назад</a>
+</div>

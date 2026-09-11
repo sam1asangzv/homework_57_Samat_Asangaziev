@@ -1,0 +1,35 @@
+@model LoginViewModel
+
+@{
+    ViewData["Title"] = "Вход";
+}
+
+<h1>Вход</h1>
+
+<form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="task-form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" autocomplete="username" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label">Пароль</label>
+        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label">Запомнить меня</label>
+    </div>
+    <button class="btn btn-primary" type="submit">Войти</button>
+    <a class="btn btn-secondary" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]">Регистрация</a>
+</form>
+
+<div class="alert alert-info mt-3">
+    Для проверки: admin@example.com / Admin123 или user@example.com / User123.
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
